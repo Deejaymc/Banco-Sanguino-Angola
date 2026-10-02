@@ -39,7 +39,7 @@ function Agendar() {
       scheduled_at: new Date(`${date}T${time}:00`).toISOString(),
     });
     setSaving(false);
-    if (error) return toast.error("Não foi possível agendar.");
+    if (error) { toast.error("Não foi possível agendar."); return; }
     toast.success("Doação agendada! O centro foi notificado.");
     qc.invalidateQueries();
     navigate({ to: "/historico" });
