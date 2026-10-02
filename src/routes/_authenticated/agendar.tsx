@@ -31,7 +31,7 @@ function Agendar() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!me || !centerId) return toast.error("Escolha um centro de colheita.");
+    if (!me || !centerId) { toast.error("Escolha um centro de colheita."); return; }
     setSaving(true);
     const { error } = await supabase.from("appointments").insert({
       donor_id: me.user.id,
