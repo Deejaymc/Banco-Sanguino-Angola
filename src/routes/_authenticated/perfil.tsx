@@ -38,7 +38,7 @@ function Perfil() {
       full_name: f.full_name, phone: f.phone || null, blood_type: f.blood_type || null,
       birth_date: f.birth_date || null, city: f.city || null,
     }).eq("id", me.user.id);
-    if (error) return toast.error("Não foi possível guardar.");
+    if (error) { toast.error("Não foi possível guardar."); return; }
     toast.success("Perfil atualizado.");
     qc.invalidateQueries({ queryKey: ["me"] });
   }

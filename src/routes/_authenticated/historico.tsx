@@ -33,7 +33,7 @@ function Historico() {
 
   async function cancel(id: string) {
     const { error } = await supabase.from("appointments").update({ status: "cancelado" }).eq("id", id);
-    if (error) return toast.error("Não foi possível cancelar.");
+    if (error) { toast.error("Não foi possível cancelar."); return; }
     toast.success("Agendamento cancelado.");
     qc.invalidateQueries();
   }
