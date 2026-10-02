@@ -14,16 +14,287 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          center_id: string
+          created_at: string
+          donor_id: string
+          id: string
+          notes: string | null
+          scheduled_at: string
+          status: string
+        }
+        Insert: {
+          center_id: string
+          created_at?: string
+          donor_id: string
+          id?: string
+          notes?: string | null
+          scheduled_at: string
+          status?: string
+        }
+        Update: {
+          center_id?: string
+          created_at?: string
+          donor_id?: string
+          id?: string
+          notes?: string | null
+          scheduled_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          active: boolean
+          blood_type: string | null
+          created_at: string
+          description: string
+          id: string
+          title: string
+          urgency: string
+        }
+        Insert: {
+          active?: boolean
+          blood_type?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          title: string
+          urgency?: string
+        }
+        Update: {
+          active?: boolean
+          blood_type?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          title?: string
+          urgency?: string
+        }
+        Relationships: []
+      }
+      centers: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          hours: string | null
+          id: string
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string
+          hours?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          hours?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      donations: {
+        Row: {
+          appointment_id: string | null
+          blood_type: string
+          center_id: string | null
+          donated_at: string
+          donor_id: string
+          id: string
+          volume_ml: number
+        }
+        Insert: {
+          appointment_id?: string | null
+          blood_type: string
+          center_id?: string | null
+          donated_at?: string
+          donor_id: string
+          id?: string
+          volume_ml?: number
+        }
+        Update: {
+          appointment_id?: string | null
+          blood_type?: string
+          center_id?: string | null
+          donated_at?: string
+          donor_id?: string
+          id?: string
+          volume_ml?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donations_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hospital_requests: {
+        Row: {
+          blood_type: string
+          created_at: string
+          hospital_id: string
+          hospital_name: string
+          id: string
+          notes: string | null
+          status: string
+          units: number
+          urgency: string
+        }
+        Insert: {
+          blood_type: string
+          created_at?: string
+          hospital_id: string
+          hospital_name: string
+          id?: string
+          notes?: string | null
+          status?: string
+          units: number
+          urgency?: string
+        }
+        Update: {
+          blood_type?: string
+          created_at?: string
+          hospital_id?: string
+          hospital_name?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          units?: number
+          urgency?: string
+        }
+        Relationships: []
+      }
+      inventory: {
+        Row: {
+          blood_type: string
+          min_units: number
+          units: number
+          updated_at: string
+        }
+        Insert: {
+          blood_type: string
+          min_units?: number
+          units?: number
+          updated_at?: string
+        }
+        Update: {
+          blood_type?: string
+          min_units?: number
+          units?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          birth_date: string | null
+          blood_type: string | null
+          city: string | null
+          created_at: string
+          full_name: string
+          id: string
+          phone: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          blood_type?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string
+          id: string
+          phone?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          blood_type?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_exists: { Args: never; Returns: boolean }
+      claim_first_admin: { Args: never; Returns: boolean }
+      complete_appointment: {
+        Args: { _appointment_id: string; _volume?: number }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      resolve_request: {
+        Args: { _approve: boolean; _request_id: string }
+        Returns: undefined
+      }
+      set_user_role: {
+        Args: {
+          _grant: boolean
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "hospital" | "donor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +421,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "hospital", "donor"],
+    },
   },
 } as const
