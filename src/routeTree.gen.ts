@@ -10,33 +10,118 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAgendarRouteImport } from './routes/_authenticated/agendar'
+import { Route as AuthenticatedCentrosRouteImport } from './routes/_authenticated/centros'
+import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAgendarRoute = AuthenticatedAgendarRouteImport.update({
+  id: '/agendar',
+  path: '/agendar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCentrosRoute = AuthenticatedCentrosRouteImport.update({
+  id: '/centros',
+  path: '/centros',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHistoricoRoute = AuthenticatedHistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/agendar': typeof AuthenticatedAgendarRoute
+  '/centros': typeof AuthenticatedCentrosRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/agendar': typeof AuthenticatedAgendarRoute
+  '/centros': typeof AuthenticatedCentrosRoute
+  '/historico': typeof AuthenticatedHistoricoRoute
+  '/painel': typeof AuthenticatedPainelRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/agendar': typeof AuthenticatedAgendarRoute
+  '/_authenticated/centros': typeof AuthenticatedCentrosRoute
+  '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/agendar'
+    | '/centros'
+    | '/historico'
+    | '/painel'
+    | '/perfil'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/agendar'
+    | '/centros'
+    | '/historico'
+    | '/painel'
+    | '/perfil'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/agendar'
+    | '/_authenticated/centros'
+    | '/_authenticated/historico'
+    | '/_authenticated/painel'
+    | '/_authenticated/perfil'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +133,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/agendar': {
+      id: '/_authenticated/agendar'
+      path: '/agendar'
+      fullPath: '/agendar'
+      preLoaderRoute: typeof AuthenticatedAgendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/centros': {
+      id: '/_authenticated/centros'
+      path: '/centros'
+      fullPath: '/centros'
+      preLoaderRoute: typeof AuthenticatedCentrosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/historico': {
+      id: '/_authenticated/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof AuthenticatedHistoricoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAgendarRoute: typeof AuthenticatedAgendarRoute
+  AuthenticatedCentrosRoute: typeof AuthenticatedCentrosRoute
+  AuthenticatedHistoricoRoute: typeof AuthenticatedHistoricoRoute
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAgendarRoute: AuthenticatedAgendarRoute,
+  AuthenticatedCentrosRoute: AuthenticatedCentrosRoute,
+  AuthenticatedHistoricoRoute: AuthenticatedHistoricoRoute,
+  AuthenticatedPainelRoute: AuthenticatedPainelRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
