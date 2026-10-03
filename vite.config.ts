@@ -33,7 +33,11 @@ export default defineConfig({
               urlPattern: ({ request, url }) =>
                 request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
               handler: "NetworkFirst",
-              options: { cacheName: "pages", networkTimeoutSeconds: 4, expiration: { maxEntries: 5 } },
+              options: {
+                cacheName: "pages",
+                networkTimeoutSeconds: 4,
+                expiration: { maxEntries: 5 },
+              },
             },
             {
               urlPattern: ({ url, sameOrigin }) =>
