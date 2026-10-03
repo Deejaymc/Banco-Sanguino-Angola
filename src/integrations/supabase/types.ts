@@ -269,6 +269,7 @@ export type Database = {
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
       claim_first_admin: { Args: never; Returns: boolean }
+      community_stats: { Args: never; Returns: Json }
       complete_appointment: {
         Args: { _appointment_id: string; _volume?: number }
         Returns: undefined
