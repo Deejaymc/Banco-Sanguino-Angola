@@ -18,9 +18,9 @@ export function useMe() {
         const meta = user.user_metadata ?? {};
         const { data: created } = await supabase.from("profiles").insert({
           id: user.id,
-          full_name: meta.full_name || meta.name || "",
-          phone: meta.phone || null,
-          blood_type: meta.blood_type || null,
+          full_name: meta["full_name"] || meta["name"] || "",
+          phone: meta["phone"] || null,
+          blood_type: meta["blood_type"] || null,
         }).select("*").maybeSingle();
         profile = created;
       }
