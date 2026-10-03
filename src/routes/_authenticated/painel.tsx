@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMe } from "@/hooks/use-me";
 import { PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { CommunityStats } from "@/components/CommunityStats";
 import { POINTS_PER_DONATION, URGENCY_LABEL, fmtDate, nextEligible } from "@/lib/blood";
 
 export const Route = createFileRoute("/_authenticated/painel")({
@@ -99,6 +100,8 @@ function Painel() {
           </ul>
         </section>
       </div>
+
+      <CommunityStats />
     </div>
   );
 }

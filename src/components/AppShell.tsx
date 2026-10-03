@@ -49,16 +49,36 @@ export function AppShell() {
     navigate({ to: "/" });
   }
 
+  const staff = !!(me?.isAdmin || me?.isHospital);
+  const initial = (me?.profile?.full_name || me?.user.email || "?").charAt(0).toUpperCase();
+
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <aside className="bg-sidebar text-sidebar-foreground md:sticky md:top-0 md:h-screen md:w-64 md:shrink-0 overflow-y-auto">
-        <div className="flex items-center gap-2 px-5 py-5">
+      {/* Mobile app header */}
+      <header className="sticky top-0 z-30 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b bg-background/90 px-4 py-3 backdrop-blur md:hidden">
+        <div className="flex min-w-0 items-center gap-2 text-primary">
+          <Droplet className="h-5 w-5 shrink-0 fill-current" />
+          <span className="truncate font-display text-lg font-semibold text-foreground">Gota Viva</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {me?.profile?.blood_type && (
+            <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-bold text-primary">{me.profile.blood_type}</span>
+          )}
+          <Link to="/perfil" className="grid h-8 w-8 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">{initial}</Link>
+          <button onClick={signOut} aria-label="Sair" className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted">
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
+      </header>
+
+      <aside className={`bg-sidebar text-sidebar-foreground md:sticky md:top-0 md:block md:h-screen md:w-64 md:shrink-0 overflow-y-auto ${staff ? "" : "hidden"}`}>
+        <div className="hidden items-center gap-2 px-5 py-5 md:flex">
           <Droplet className="h-6 w-6 fill-current" />
           <span className="font-display text-xl font-semibold">Gota Viva</span>
         </div>
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col md:overflow-visible">
+        <nav className="flex gap-1 overflow-x-auto px-3 py-2 md:flex-col md:overflow-visible md:py-0 md:pb-3">
           <p className="hidden px-3 pt-2 pb-1 text-xs uppercase tracking-wider text-sidebar-foreground/50 md:block">Doador</p>
-          {donorNav.map((n) => <NavItem key={n.to} {...n} />)}
+          <div className="hidden md:contents">{donorNav.map((n) => <NavItem key={n.to} {...n} />)}</div>
           {me?.isHospital && (
             <>
               <p className="hidden px-3 pt-4 pb-1 text-xs uppercase tracking-wider text-sidebar-foreground/50 md:block">Hospital</p>
@@ -79,12 +99,28 @@ export function AppShell() {
           </button>
         </div>
       </aside>
-      <main className="flex-1 px-5 py-8 md:px-10">
+
+      <main className="flex-1 px-4 pt-6 pb-28 md:px-10 md:py-8">
         <div className="mx-auto max-w-6xl">
           <Outlet />
         </div>
-        <button onClick={signOut} className="mt-10 text-sm text-muted-foreground underline md:hidden">Sair</button>
       </main>
+
+      {/* Mobile bottom tab bar */}
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+        {donorNav.map(({ to, label, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            activeOptions={{ exact: true }}
+            className="flex flex-col items-center gap-1 py-2.5 text-[11px] text-muted-foreground"
+            activeProps={{ className: "text-primary font-semibold" }}
+          >
+            <Icon className="h-5 w-5" />
+            <span className="truncate">{label.split(" ")[0]}</span>
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }
