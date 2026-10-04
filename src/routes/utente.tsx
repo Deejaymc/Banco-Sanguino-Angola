@@ -11,9 +11,9 @@ export const Route = createFileRoute("/utente")({
   head: () => ({
     meta: [
       { title: "Procurar sangue — Gota Viva" },
-      { name: "description", content: "Pesquise a disponibilidade de sangue por tipo sanguíneo nos centros e unidades hospitalares da rede Gota Viva." },
+      { name: "description", content: "Pesquise a disponibilidade de sangue por tipo sanguíneo e encontre a unidade ou centro hospitalar mais próximo na rede Gota Viva." },
       { property: "og:title", content: "Procurar sangue — Gota Viva" },
-      { property: "og:description", content: "Encontre o tipo sanguíneo que procura num centro ou hospital da rede." },
+      { property: "og:description", content: "Encontre o tipo sanguíneo que procura e o centro ou hospital mais próximo." },
     ],
   }),
   component: UtentePage,
@@ -33,16 +33,17 @@ function UtentePage() {
     queryFn: async () => (await supabase.from("centers").select("*").order("name")).data ?? [],
   });
 
-  const results = useMemo(() => {
+  const selected = useMemo(
+    () => (inventory ?? []).find((i) => i.blood_type === bloodType) ?? null,
+    [inventory, bloodType],
+  );
+
+  const filteredCenters = useMemo(() => {
     const t = term.trim().toLowerCase();
-    return (centers ?? [])
-      .filter((c) => !t || c.name.toLowerCase().includes(t) || (c.city ?? "").toLowerCase().includes(t))
-      .map((c) => {
-        const rows = (inventory ?? []).filter((i) => i.center_id === c.id && (!bloodType || i.blood_type === bloodType));
-        return { center: c, rows };
-      })
-      .filter((r) => r.rows.length > 0 || !bloodType);
-  }, [centers, inventory, bloodType, term]);
+    return (centers ?? []).filter(
+      (c) => !t || c.name.toLowerCase().includes(t) || (c.city ?? "").toLowerCase().includes(t),
+    );
+  }, [centers, term]);
 
   return (
     <div className="min-h-screen">
@@ -57,67 +58,82 @@ function UtentePage() {
       <main className="mx-auto max-w-5xl px-6 pb-20">
         <h1 className="text-4xl font-semibold md:text-5xl">Procurar <span className="text-primary italic">sangue disponível</span></h1>
         <p className="mt-3 max-w-xl text-muted-foreground">
-          Escolha o tipo sanguíneo e pesquise a unidade ou centro hospitalar para ver a disponibilidade em tempo real.
+          Escolha o tipo sanguíneo para ver a disponibilidade na rede e pesquise a unidade ou centro hospitalar mais próximo.
         </p>
 
-        <div className="mt-8 flex flex-col gap-4">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={term}
-              onChange={(e) => setTerm(e.target.value)}
-              placeholder="Pesquisar unidade ou centro hospitalar…"
-              className="pl-9"
-            />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant={bloodType === null ? "default" : "outline"} onClick={() => setBloodType(null)}>Todos</Button>
-            {BLOOD_TYPES.map((b) => (
-              <Button key={b} size="sm" variant={bloodType === b ? "default" : "outline"} onClick={() => setBloodType(b)}>{b}</Button>
-            ))}
-          </div>
+        <div className="mt-8 flex flex-wrap gap-2">
+          {BLOOD_TYPES.map((b) => (
+            <Button key={b} size="sm" variant={bloodType === b ? "default" : "outline"} onClick={() => setBloodType(bloodType === b ? null : b)}>{b}</Button>
+          ))}
         </div>
 
-        <div className="mt-10 grid gap-5">
-          {results.length === 0 && (
-            <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">
-              Nenhum centro encontrado com esses critérios.
+        {selected && (() => {
+          const s = stockLevel(selected.units, selected.min_units);
+          return (
+            <div className={`mt-6 rounded-2xl p-6 ${s.tone}`}>
+              <p className="text-sm uppercase tracking-wider opacity-80">Disponibilidade na rede</p>
+              <p className="mt-1 text-3xl font-bold">{selected.blood_type} — {selected.units} unidades</p>
+              <p className="mt-1 text-sm font-medium">Nível: {s.label}</p>
+              {s.label !== "Adequado" && (
+                <p className="mt-3 text-sm opacity-90">
+                  Este tipo está em falta. Se puder doar, a sua ajuda faz diferença agora.
+                </p>
+              )}
+            </div>
+          );
+        })()}
+
+        {!bloodType && (
+          <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {(inventory ?? []).map((i) => {
+              const s = stockLevel(i.units, i.min_units);
+              return (
+                <button
+                  key={i.blood_type}
+                  onClick={() => setBloodType(i.blood_type)}
+                  className={`rounded-lg px-3 py-2.5 text-center transition-transform hover:scale-[1.03] ${s.tone}`}
+                >
+                  <p className="text-lg font-bold">{i.blood_type}</p>
+                  <p className="text-xs font-medium">{i.units} unidades · {s.label}</p>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        <h2 className="mt-12 text-2xl font-semibold">Unidades e centros hospitalares</h2>
+        <div className="relative mt-4 max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+            placeholder="Pesquisar por nome ou cidade…"
+            className="pl-9"
+          />
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {filteredCenters.length === 0 && (
+            <p className="col-span-full rounded-xl border border-dashed p-8 text-center text-muted-foreground">
+              Nenhuma unidade encontrada com esse nome.
             </p>
           )}
-          {results.map(({ center, rows }) => (
-            <div key={center.id} className="panel p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-xl font-semibold">{center.name}</h2>
-                  <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />{center.address}{center.city ? `, ${center.city}` : ""}
-                  </p>
-                  <div className="mt-1 flex flex-wrap gap-4 text-sm text-muted-foreground">
-                    {center.phone && <span className="flex items-center gap-1.5"><Phone className="h-4 w-4" />{center.phone}</span>}
-                    {center.hours && <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{center.hours}</span>}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {rows.map((i) => {
-                  const s = stockLevel(i.units, i.min_units);
-                  return (
-                    <div key={i.blood_type} className={`rounded-lg px-3 py-2.5 text-center ${s.tone}`}>
-                      <p className="text-lg font-bold">{i.blood_type}</p>
-                      <p className="text-xs font-medium">{i.units} unidades · {s.label}</p>
-                    </div>
-                  );
-                })}
-                {rows.length === 0 && (
-                  <p className="col-span-full text-sm text-muted-foreground">Sem informação de estoque para este centro.</p>
-                )}
+          {filteredCenters.map((c) => (
+            <div key={c.id} className="panel p-5">
+              <h3 className="text-lg font-semibold">{c.name}</h3>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4" />{c.address}{c.city ? `, ${c.city}` : ""}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                {c.phone && <span className="flex items-center gap-1.5"><Phone className="h-4 w-4" />{c.phone}</span>}
+                {c.hours && <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{c.hours}</span>}
               </div>
             </div>
           ))}
         </div>
 
         <p className="mt-10 text-center text-sm text-muted-foreground">
-          Em caso de urgência, contacte diretamente o centro mais próximo. Os níveis são atualizados automaticamente.
+          Em caso de urgência, contacte diretamente a unidade mais próxima. Os níveis são atualizados automaticamente.
         </p>
       </main>
     </div>
