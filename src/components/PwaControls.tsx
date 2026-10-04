@@ -24,7 +24,7 @@ export function PwaControls() {
     window.addEventListener("beforeinstallprompt", bip);
 
     const standalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia?.("(display-mode: standalone)")?.matches ||
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
     setShowIos(ios && !standalone);
