@@ -52,8 +52,9 @@ function Index() {
           <p className="mt-5 max-w-md text-lg text-muted-foreground">
             Registe-se, agende a sua doação e acompanhe o impacto que faz — enquanto centros e hospitais gerem o estoque com transparência.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg"><Link to="/auth">Quero ser doador</Link></Button>
+            <Button asChild size="lg" variant="outline"><Link to="/utente">Sou utente — procurar sangue</Link></Button>
           </div>
         </div>
         <div className="relative">
