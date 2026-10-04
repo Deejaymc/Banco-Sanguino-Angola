@@ -23,22 +23,13 @@ export default defineConfig({
         filename: "sw.js",
         devOptions: { enabled: false },
         workbox: {
-          // Only same-origin static, hashed build assets + icons. No HTML, no API, no user data.
+          // Only same-origin static build assets + icons. Never cache HTML, navigations,
+          // Supabase/API responses, OAuth callbacks, or authenticated user data.
           globPatterns: ["**/*.{js,css,woff2,png,svg,ico,webmanifest}"],
           globIgnores: ["**/server/**", "**/_worker.js/**"],
           navigateFallback: null,
           cleanupOutdatedCaches: true,
           runtimeCaching: [
-            {
-              urlPattern: ({ request, url }) =>
-                request.mode === "navigate" && !url.pathname.startsWith("/~oauth"),
-              handler: "NetworkFirst",
-              options: {
-                cacheName: "pages",
-                networkTimeoutSeconds: 4,
-                expiration: { maxEntries: 5 },
-              },
-            },
             {
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin && /\/assets\/.+-[A-Za-z0-9_-]{8,}\.(js|css|woff2?)$/.test(url.pathname),
