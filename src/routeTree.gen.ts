@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as UtenteRouteImport } from './routes/utente'
 import { Route as AuthenticatedAgendarRouteImport } from './routes/_authenticated/agendar'
 import { Route as AuthenticatedCentrosRouteImport } from './routes/_authenticated/centros'
 import { Route as AuthenticatedHistoricoRouteImport } from './routes/_authenticated/historico'
@@ -37,6 +38,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UtenteRoute = UtenteRouteImport.update({
+  id: '/utente',
+  path: '/utente',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAgendarRoute = AuthenticatedAgendarRouteImport.update({
@@ -108,6 +114,7 @@ const AuthenticatedAdminPedidosRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/utente': typeof UtenteRoute
   '/agendar': typeof AuthenticatedAgendarRoute
   '/centros': typeof AuthenticatedCentrosRoute
   '/historico': typeof AuthenticatedHistoricoRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/utente': typeof UtenteRoute
   '/agendar': typeof AuthenticatedAgendarRoute
   '/centros': typeof AuthenticatedCentrosRoute
   '/historico': typeof AuthenticatedHistoricoRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/utente': typeof UtenteRoute
   '/_authenticated/agendar': typeof AuthenticatedAgendarRoute
   '/_authenticated/centros': typeof AuthenticatedCentrosRoute
   '/_authenticated/historico': typeof AuthenticatedHistoricoRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/utente'
     | '/agendar'
     | '/centros'
     | '/historico'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/utente'
     | '/agendar'
     | '/centros'
     | '/historico'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/utente'
     | '/_authenticated/agendar'
     | '/_authenticated/centros'
     | '/_authenticated/historico'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  UtenteRoute: typeof UtenteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/utente': {
+      id: '/utente'
+      path: '/utente'
+      fullPath: '/utente'
+      preLoaderRoute: typeof UtenteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/agendar': {
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  UtenteRoute: UtenteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
